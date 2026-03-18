@@ -65,6 +65,8 @@ const STYLES = [
   { id: "pencil_sketch", label: "Esquisse au Crayon" },
   { id: "watercolor", label: "Aquarelle" },
   { id: "vintage_poster", label: "Affiche Vintage" },
+  { id: "james_bond", label: "James Bond" },
+  { id: "the_saint", label: "Le Saint" },
 ];
 
 export default function Home() {
@@ -490,6 +492,8 @@ function buildPrompt({ car, angle, color, environment, style, occupants, customP
     pencil_sketch: "detailed pencil sketch, fine lines, cross-hatching, technical illustration style",
     watercolor: "watercolor painting, soft washes, artistic, loose brushwork",
     vintage_poster: "vintage racing poster style, bold colors, retro typography feel, 1950s poster art",
+    james_bond: "cinematic spy thriller style, dramatic shadows, sleek and glamorous, high-contrast lighting reminiscent of 1960s James Bond films, secret agent atmosphere, Monte Carlo or Aston Martin vibes",
+    the_saint: "stylish 1960s British TV series aesthetic, elegant and witty, Roger Moore as Simon Templar style, cream-colored Volvo P1800 era, suave gentleman adventurer mood, clean cinematic framing",
   };
 
   const occupantsText = occupantsMap[occupants.id];

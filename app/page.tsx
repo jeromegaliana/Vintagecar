@@ -12,6 +12,14 @@ const CAR_MODELS = [
   { id: "maserati_a6", label: "Maserati A6 GCS", year: "1947–1953" },
   { id: "mercedes_300sl", label: "Mercedes-Benz 300 SL", year: "1954–1957" },
   { id: "aston_db2", label: "Aston Martin DB2", year: "1950–1953" },
+  { id: "lancia_aurelia", label: "Lancia Aurelia B20 GT", year: "1951–1958" },
+  { id: "bugatti_57", label: "Bugatti Type 57 Atlantic", year: "1934–1940" },
+  { id: "cisitalia_202", label: "Cisitalia 202", year: "1947–1952" },
+  { id: "delahaye_135", label: "Delahaye 135 MS", year: "1935–1954" },
+  { id: "triumph_tr2", label: "Triumph TR2", year: "1953–1955" },
+  { id: "ferrari_250", label: "Ferrari 250 GT", year: "1954–1964" },
+  { id: "talbot_lago", label: "Talbot-Lago T26 GS", year: "1947–1955" },
+  { id: "lotus_eleven", label: "Lotus Eleven", year: "1956–1958" },
 ];
 
 const VIEW_ANGLES = [

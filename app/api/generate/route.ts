@@ -37,41 +37,33 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const { car, angle, color, environment, style, customPrompt, apiKey: clientApiKey } = body;
 
-  const apiKey = clientApiKey || process.env.XAI_API_KEY;
+  const apiKey = clientApiKey || process.env.HF_API_KEY;
   if (!apiKey) {
-    return NextResponse.json({ error: "Clé API manquante. Entrez votre clé xAI dans les paramètres." }, { status: 401 });
+    return NextResponse.json({ error: "Clé API manquante. Entrez votre clé Hugging Face (hf_...) dans les paramètres." }, { status: 401 });
   }
 
   const prompt = buildPrompt(car, angle, color, environment, style, customPrompt || "");
 
-  const response = await fetch("https://api.x.ai/v1/images/generations", {
+  const response = await fetch("https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
     },
-    body: JSON.stringify({
-      model: "grok-2-image",
-      prompt,
-      n: 1,
-      response_format: "url",
-    }),
+    body: JSON.stringify({ inputs: prompt }),
   });
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
+    const errorText = await response.text().catch(() => "");
     return NextResponse.json(
-      { error: errorData.error?.message || `API error: ${response.status}` },
+      { error: `API error: ${response.status}${errorText ? " - " + errorText : ""}` },
       { status: response.status }
     );
   }
 
-  const data = await response.json();
-  const imageUrl = data.data?.[0]?.url;
-
-  if (!imageUrl) {
-    return NextResponse.json({ error: "No image returned from API" }, { status: 500 });
-  }
+  const imageBuffer = await response.arrayBuffer();
+  const base64 = Buffer.from(imageBuffer).toString("base64");
+  const imageUrl = `data:image/jpeg;base64,${base64}`;
 
   return NextResponse.json({ imageUrl, prompt });
 }

@@ -67,12 +67,12 @@ export default function Home() {
   const [apiKeySaved, setApiKeySaved] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("xai_api_key");
+    const saved = localStorage.getItem("hf_api_key");
     if (saved) setApiKey(saved);
   }, []);
 
   const saveApiKey = () => {
-    localStorage.setItem("xai_api_key", apiKey);
+    localStorage.setItem("hf_api_key", apiKey);
     setApiKeySaved(true);
     setTimeout(() => setApiKeySaved(false), 2000);
   };
@@ -123,14 +123,14 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 rounded px-3 py-2" style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(212,168,67,0.2)" }}>
-              <span className="text-xs tracking-widest whitespace-nowrap" style={{ color: "#6a4a20" }}>CLÉ API xAI</span>
+              <span className="text-xs tracking-widest whitespace-nowrap" style={{ color: "#6a4a20" }}>CLÉ API HF</span>
               <div className="flex items-center gap-1">
                 <input
                   type={showApiKey ? "text" : "password"}
                   value={apiKey}
                   onChange={(e) => setApiKey(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && saveApiKey()}
-                  placeholder="xai-..."
+                  placeholder="hf_..."
                   className="text-sm outline-none w-48"
                   style={{ background: "transparent", color: "#d4a843", caretColor: "#d4a843" }}
                 />
@@ -157,7 +157,7 @@ export default function Home() {
             </div>
             <div className="text-right text-xs" style={{ color: "#6a4a20" }}>
               <div>Propulsé par</div>
-              <div className="text-amber-500 font-bold">Grok AI</div>
+              <div className="text-amber-500 font-bold">Hugging Face</div>
             </div>
           </div>
         </div>
@@ -371,7 +371,7 @@ export default function Home() {
           {!apiKey && (
             <div className="px-4 py-3 rounded text-sm flex items-center gap-2" style={{ background: "rgba(180,120,0,0.1)", border: "1px solid rgba(180,120,0,0.3)", color: "#c09040" }}>
               <span>⚠️</span>
-              <span>Entrez votre clé API xAI dans le champ en haut à droite pour générer des images.</span>
+              <span>Entrez votre clé Hugging Face (hf_...) dans le champ en haut à droite pour générer des images.</span>
             </div>
           )}
 

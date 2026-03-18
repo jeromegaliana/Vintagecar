@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 
 const CAR_MODELS = [
@@ -62,6 +62,20 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [activeImage, setActiveImage] = useState<string | null>(null);
+  const [apiKey, setApiKey] = useState("");
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [apiKeySaved, setApiKeySaved] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("xai_api_key");
+    if (saved) setApiKey(saved);
+  }, []);
+
+  const saveApiKey = () => {
+    localStorage.setItem("xai_api_key", apiKey);
+    setApiKeySaved(true);
+    setTimeout(() => setApiKeySaved(false), 2000);
+  };
 
   const handleGenerate = async () => {
     setIsLoading(true);
@@ -78,6 +92,7 @@ export default function Home() {
           environment: selectedEnv,
           style: selectedStyle,
           customPrompt,
+          apiKey: apiKey || undefined,
         }),
       });
 
@@ -106,9 +121,44 @@ export default function Home() {
               AUTOMOBILES DE SPORT DES ANNÉES 40–50
             </p>
           </div>
-          <div className="text-right text-xs" style={{ color: "#6a4a20" }}>
-            <div>Propulsé par</div>
-            <div className="text-amber-500 font-bold">Grok AI</div>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 rounded px-3 py-2" style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(212,168,67,0.2)" }}>
+              <span className="text-xs tracking-widest whitespace-nowrap" style={{ color: "#6a4a20" }}>CLÉ API xAI</span>
+              <div className="flex items-center gap-1">
+                <input
+                  type={showApiKey ? "text" : "password"}
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && saveApiKey()}
+                  placeholder="xai-..."
+                  className="text-sm outline-none w-48"
+                  style={{ background: "transparent", color: "#d4a843", caretColor: "#d4a843" }}
+                />
+                <button
+                  onClick={() => setShowApiKey((v) => !v)}
+                  className="text-xs px-1 transition-colors"
+                  style={{ color: "#6a4a20" }}
+                  title={showApiKey ? "Masquer" : "Afficher"}
+                >
+                  {showApiKey ? "🙈" : "👁"}
+                </button>
+                <button
+                  onClick={saveApiKey}
+                  className="text-xs px-2 py-1 rounded transition-all"
+                  style={{
+                    background: apiKeySaved ? "rgba(80,160,80,0.2)" : "rgba(212,168,67,0.15)",
+                    border: apiKeySaved ? "1px solid rgba(80,160,80,0.4)" : "1px solid rgba(212,168,67,0.3)",
+                    color: apiKeySaved ? "#80c080" : "#d4a843",
+                  }}
+                >
+                  {apiKeySaved ? "✓" : "Enregistrer"}
+                </button>
+              </div>
+            </div>
+            <div className="text-right text-xs" style={{ color: "#6a4a20" }}>
+              <div>Propulsé par</div>
+              <div className="text-amber-500 font-bold">Grok AI</div>
+            </div>
           </div>
         </div>
       </header>
@@ -316,6 +366,14 @@ export default function Home() {
               }}
             />
           </section>
+
+          {/* API key warning */}
+          {!apiKey && (
+            <div className="px-4 py-3 rounded text-sm flex items-center gap-2" style={{ background: "rgba(180,120,0,0.1)", border: "1px solid rgba(180,120,0,0.3)", color: "#c09040" }}>
+              <span>⚠️</span>
+              <span>Entrez votre clé API xAI dans le champ en haut à droite pour générer des images.</span>
+            </div>
+          )}
 
           {/* Error */}
           {error && (

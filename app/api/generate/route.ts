@@ -34,13 +34,13 @@ function buildPrompt(car: { label: string; year: string }, angle: { id: string; 
 }
 
 export async function POST(request: NextRequest) {
-  const apiKey = process.env.XAI_API_KEY;
-  if (!apiKey) {
-    return NextResponse.json({ error: "XAI_API_KEY not configured" }, { status: 500 });
-  }
-
   const body = await request.json();
-  const { car, angle, color, environment, style, customPrompt } = body;
+  const { car, angle, color, environment, style, customPrompt, apiKey: clientApiKey } = body;
+
+  const apiKey = clientApiKey || process.env.XAI_API_KEY;
+  if (!apiKey) {
+    return NextResponse.json({ error: "Clé API manquante. Entrez votre clé xAI dans les paramètres." }, { status: 401 });
+  }
 
   const prompt = buildPrompt(car, angle, color, environment, style, customPrompt || "");
 

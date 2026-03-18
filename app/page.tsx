@@ -49,6 +49,14 @@ const ENVIRONMENTS = [
   { id: "race_track", label: "Circuit de Course" },
   { id: "garage", label: "Garage Vintage" },
   { id: "countryside", label: "Campagne" },
+  { id: "city_street", label: "Rue de Ville" },
+  { id: "tunnel", label: "Tunnel" },
+];
+
+const OCCUPANTS = [
+  { id: "none", label: "Aucun" },
+  { id: "driver", label: "Conducteur" },
+  { id: "driver_passenger", label: "Conducteur + Passagère" },
 ];
 
 const STYLES = [
@@ -65,6 +73,7 @@ export default function Home() {
   const [selectedColor, setSelectedColor] = useState(COLORS[0]);
   const [selectedEnv, setSelectedEnv] = useState(ENVIRONMENTS[0]);
   const [selectedStyle, setSelectedStyle] = useState(STYLES[0]);
+  const [selectedOccupants, setSelectedOccupants] = useState(OCCUPANTS[0]);
   const [customPrompt, setCustomPrompt] = useState("");
   const [generatedImages, setGeneratedImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -99,6 +108,7 @@ export default function Home() {
           color: selectedColor,
           environment: selectedEnv,
           style: selectedStyle,
+          occupants: selectedOccupants,
           customPrompt,
           apiKey: apiKey || undefined,
         }),
@@ -249,6 +259,28 @@ export default function Home() {
                   <span className="text-xs text-center leading-tight" style={{ color: selectedColor.id === color.id ? "#d4a843" : "#806040" }}>
                     {color.label}
                   </span>
+                </button>
+              ))}
+            </div>
+          </section>
+          {/* Occupants */}
+          <section>
+            <h2 className="text-xs font-bold tracking-widest mb-3" style={{ color: "#d4a843" }}>
+              OCCUPANTS
+            </h2>
+            <div className="space-y-2">
+              {OCCUPANTS.map((occ) => (
+                <button
+                  key={occ.id}
+                  onClick={() => setSelectedOccupants(occ)}
+                  className="w-full text-left px-4 py-3 rounded transition-all duration-200"
+                  style={{
+                    background: selectedOccupants.id === occ.id ? "rgba(212,168,67,0.15)" : "rgba(255,255,255,0.03)",
+                    border: selectedOccupants.id === occ.id ? "1px solid rgba(212,168,67,0.5)" : "1px solid rgba(255,255,255,0.06)",
+                    color: selectedOccupants.id === occ.id ? "#d4a843" : "#a08060",
+                  }}
+                >
+                  <div className="font-semibold text-sm">{occ.label}</div>
                 </button>
               ))}
             </div>
@@ -411,7 +443,7 @@ export default function Home() {
               VOIR LE PROMPT GÉNÉRÉ
             </summary>
             <div className="mt-2 p-3 rounded font-mono" style={{ background: "rgba(0,0,0,0.2)", border: "1px solid rgba(255,255,255,0.05)" }}>
-              {buildPrompt({ car: selectedCar, angle: selectedAngle, color: selectedColor, environment: selectedEnv, style: selectedStyle, customPrompt })}
+              {buildPrompt({ car: selectedCar, angle: selectedAngle, color: selectedColor, environment: selectedEnv, style: selectedStyle, occupants: selectedOccupants, customPrompt })}
             </div>
           </details>
         </div>
@@ -420,12 +452,13 @@ export default function Home() {
   );
 }
 
-function buildPrompt({ car, angle, color, environment, style, customPrompt }: {
+function buildPrompt({ car, angle, color, environment, style, occupants, customPrompt }: {
   car: typeof CAR_MODELS[0];
   angle: typeof VIEW_ANGLES[0];
   color: typeof COLORS[0];
   environment: typeof ENVIRONMENTS[0];
   style: typeof STYLES[0];
+  occupants: typeof OCCUPANTS[0];
   customPrompt: string;
 }) {
   const angleMap: Record<string, string> = {
@@ -443,6 +476,13 @@ function buildPrompt({ car, angle, color, environment, style, customPrompt }: {
     race_track: "on a vintage race track circuit",
     garage: "in an old vintage garage with cobblestone floor",
     countryside: "in a scenic French countryside landscape",
+    city_street: "on a cobblestone city street with elegant 1950s buildings, Parisian boulevard atmosphere",
+    tunnel: "emerging from a dramatic stone tunnel, headlights on, with light rays and atmospheric fog",
+  };
+  const occupantsMap: Record<string, string> = {
+    none: "",
+    driver: "with a stylish male driver wearing a leather racing helmet and goggles, period-correct racing attire",
+    driver_passenger: "with a stylish male driver wearing a leather racing helmet and goggles and an elegant female passenger with a silk scarf and vintage sunglasses",
   };
   const styleMap: Record<string, string> = {
     photorealistic: "ultra-photorealistic, 8K quality, dramatic lighting, depth of field",
@@ -452,7 +492,8 @@ function buildPrompt({ car, angle, color, environment, style, customPrompt }: {
     vintage_poster: "vintage racing poster style, bold colors, retro typography feel, 1950s poster art",
   };
 
-  let prompt = `A stunning ${color.label.toLowerCase()} ${car.label} (${car.year}), ${angleMap[angle.id] || angle.label}, ${envMap[environment.id] || environment.label}. ${styleMap[style.id] || style.label}. The car features authentic period-correct details: wire wheels, chrome bumpers, curved fenders, round headlights typical of 1940s-1950s sports cars. Classic vintage automobile photography.`;
+  const occupantsText = occupantsMap[occupants.id];
+  let prompt = `A stunning ${color.label.toLowerCase()} ${car.label} (${car.year}), ${angleMap[angle.id] || angle.label}, ${envMap[environment.id] || environment.label}${occupantsText ? `, ${occupantsText}` : ""}. ${styleMap[style.id] || style.label}. The car features authentic period-correct details: wire wheels, chrome bumpers, curved fenders, round headlights typical of 1940s-1950s sports cars. Classic vintage automobile photography.`;
 
   if (customPrompt) prompt += ` Additional details: ${customPrompt}`;
 

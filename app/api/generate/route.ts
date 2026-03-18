@@ -16,6 +16,14 @@ const ENV_MAP: Record<string, string> = {
   race_track: "on a vintage race track circuit",
   garage: "in an old vintage garage with cobblestone floor",
   countryside: "in a scenic French countryside landscape",
+  city_street: "on a cobblestone city street with elegant 1950s buildings, Parisian boulevard atmosphere",
+  tunnel: "emerging from a dramatic stone tunnel, headlights on, with light rays and atmospheric fog",
+};
+
+const OCCUPANTS_MAP: Record<string, string> = {
+  none: "",
+  driver: "with a stylish male driver wearing a leather racing helmet and goggles, period-correct racing attire",
+  driver_passenger: "with a stylish male driver wearing a leather racing helmet and goggles and an elegant female passenger with a silk scarf and vintage sunglasses",
 };
 
 const STYLE_MAP: Record<string, string> = {
@@ -26,8 +34,9 @@ const STYLE_MAP: Record<string, string> = {
   vintage_poster: "vintage racing poster style, bold colors, retro typography feel, 1950s poster art",
 };
 
-function buildPrompt(car: { label: string; year: string }, angle: { id: string; label: string }, color: { label: string }, environment: { id: string; label: string }, style: { id: string }, customPrompt: string) {
-  let prompt = `A stunning ${color.label.toLowerCase()} ${car.label} (${car.year}), ${ANGLE_MAP[angle.id] || angle.label}, ${ENV_MAP[environment.id] || environment.label}. ${STYLE_MAP[style.id] || "photorealistic"}. The car features authentic period-correct details: wire wheels, chrome bumpers, curved fenders, round headlights typical of 1940s-1950s sports cars. Classic vintage automobile photography.`;
+function buildPrompt(car: { label: string; year: string }, angle: { id: string; label: string }, color: { label: string }, environment: { id: string; label: string }, style: { id: string }, occupants: { id: string }, customPrompt: string) {
+  const occupantsText = OCCUPANTS_MAP[occupants?.id] || "";
+  let prompt = `A stunning ${color.label.toLowerCase()} ${car.label} (${car.year}), ${ANGLE_MAP[angle.id] || angle.label}, ${ENV_MAP[environment.id] || environment.label}${occupantsText ? `, ${occupantsText}` : ""}. ${STYLE_MAP[style.id] || "photorealistic"}. The car features authentic period-correct details: wire wheels, chrome bumpers, curved fenders, round headlights typical of 1940s-1950s sports cars. Classic vintage automobile photography.`;
 
   if (customPrompt) prompt += ` Additional details: ${customPrompt}`;
   return prompt;
@@ -35,14 +44,14 @@ function buildPrompt(car: { label: string; year: string }, angle: { id: string; 
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { car, angle, color, environment, style, customPrompt, apiKey: clientApiKey } = body;
+  const { car, angle, color, environment, style, occupants, customPrompt, apiKey: clientApiKey } = body;
 
   const apiKey = clientApiKey || process.env.HF_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ error: "Clé API manquante. Entrez votre clé Hugging Face (hf_...) dans les paramètres." }, { status: 401 });
   }
 
-  const prompt = buildPrompt(car, angle, color, environment, style, customPrompt || "");
+  const prompt = buildPrompt(car, angle, color, environment, style, occupants || { id: "none" }, customPrompt || "");
 
   const response = await fetch("https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell", {
     method: "POST",

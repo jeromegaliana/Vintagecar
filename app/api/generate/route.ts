@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
 
   const prompt = buildPrompt(car, angle, color, environment, style, customPrompt || "");
 
-  const response = await fetch("https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell", {
+  const response = await fetch("https://router.huggingface.co/hf-inference/models/black-forest-labs/FLUX.1-schnell", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
